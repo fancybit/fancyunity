@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="FancyUnity.EventManager">
+    <Position X="7.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAABAAAAJAAAAAAIAAAAAAA=</HashCode>
+      <FileName>Assets\FancyUnity\System\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FancyUnity.EventRegister">
+    <Position X="11.75" Y="3.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="FancyUnity.EventRegister.Delegate&lt;T&gt;" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Assets\FancyUnity\System\EventManager.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\FancyUnity\System\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="FancyUnity.GameEvent" Collapsed="true">
+    <Position X="4.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAAAIAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\FancyUnity\System\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Interface Name="FancyUnity.EventListener&lt;T&gt;" Collapsed="true">
+    <Position X="3.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\FancyUnity\System\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="FancyUnity.EventListenerBase" Collapsed="true">
+    <Position X="7.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\FancyUnity\System\EventManager.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>
