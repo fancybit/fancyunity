@@ -1,0 +1,18 @@
+{
+    "name": "FancyUnity.Editor",
+    "references": [
+        "GUID:87a27b898d586bd49ad656f9adc4e204",
+        "GUID:17b752c971dcbd64f9204935449ff479",
+        "GUID:0fa71125e8523384d8fee559e7e21709"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

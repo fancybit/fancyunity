@@ -1,0 +1,15 @@
+{
+    "name": "FancyUnity",
+    "references": [
+        "GUID:87a27b898d586bd49ad656f9adc4e204",
+        "GUID:f1e5e3e45194c0a4787ad5bc5ff1ef85"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
