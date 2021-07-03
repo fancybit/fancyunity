@@ -21,7 +21,7 @@ namespace FancyUnity
 				{
 					if (_inst == null)
 					{
-						GameObject obj = new GameObject();
+						GameObject obj = new GameObject(typeof(T).Name);
 						DontDestroyOnLoad(obj);
 						_inst = obj.AddComponent<T>();
 					}
