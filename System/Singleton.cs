@@ -43,5 +43,11 @@ namespace FancyUnity
 			DontDestroyOnLoad(gameObject);
 		}
 
+		public virtual void RemoveSelf()
+        {
+			_inst = null;
+			DestroyImmediate(gameObject);
+        }
+
 	}
 }
