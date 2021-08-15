@@ -48,6 +48,5 @@ namespace FancyUnity
 			_inst = null;
 			DestroyImmediate(gameObject);
         }
-
 	}
 }
