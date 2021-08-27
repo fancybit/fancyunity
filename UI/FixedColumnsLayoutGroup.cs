@@ -64,13 +64,14 @@ namespace FancyUnity
         public override void CalculateLayoutInputVertical()
         {
             base.CalculateLayoutInputHorizontal();
-            if (ColumnCount == 0)
+            if (transform.childCount == 0)
             {
                 var selfHeight = rectTrans.rect.height;
                 SetLayoutInputForAxis(selfHeight, selfHeight, -1, 1);
             }
             else
             {
+                _cellHeight = WHRatio * _cellWidth;
                 var selfHeight = _cellHeight * (transform.childCount / ColumnCount);
                 SetLayoutInputForAxis(selfHeight, selfHeight, -1, 1);
                 rectTrans.anchorMin = new Vector2(0, 1);
@@ -82,7 +83,7 @@ namespace FancyUnity
 
         public override void SetLayoutVertical()
         {
-            _cellHeight = WHRatio * _cellWidth;
+            
             var cellHeight = _cellHeight;
             cellHeight -= Gaps.y;
             _cellWidth = Mathf.Abs(GetTotalPreferredSize(0) / ColumnCount);
