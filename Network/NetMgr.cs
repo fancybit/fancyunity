@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -41,7 +42,9 @@ namespace FancyUnity
             string url, TReqData postData, Action<TRespData> callback)
         {
             var jsonData = JsonConvert.SerializeObject(postData);
-            using (var webRequest = UnityWebRequest.Post(url, jsonData))
+            var form = new Dictionary<string,string>();
+            form.Add("data",jsonData);
+            using (var webRequest = UnityWebRequest.Post(url, form))
             {
                 var req = webRequest.SendWebRequest();
                 yield return req;
