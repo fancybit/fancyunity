@@ -41,22 +41,6 @@ namespace FancyUnity
         }
     }
 
-    public class UnityPromise<TResult> : Promise<TResult>
-    {
-        protected TResult result;
-        public UnityPromise<TResult> Then<TWaitter>(TWaitter waitter, Func<TWaitter, TResult> callback)
-        {
-            var mgr = PromiseMgr.Inst;
-            var promise = new UnityPromise<TResult>();
-            mgr.StartCoroutine(mgr.RunWaitter(promise, waitter, callback));
-            return promise;
-
-        }
-
-
-
-
-    }
 
 }
 
