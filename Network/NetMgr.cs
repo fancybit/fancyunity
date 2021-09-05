@@ -1,9 +1,12 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+using Newtonsoft.Json;
 
 namespace FancyUnity
 {
@@ -42,8 +45,8 @@ namespace FancyUnity
             string url, TReqData postData, Action<TRespData> callback)
         {
             var jsonData = JsonConvert.SerializeObject(postData);
-            var form = new Dictionary<string,string>();
-            form.Add("data",jsonData);
+            var form = new Dictionary<string, string>();
+            form.Add("data", jsonData);
             using (var webRequest = UnityWebRequest.Post(url, form))
             {
                 var req = webRequest.SendWebRequest();
@@ -62,6 +65,14 @@ namespace FancyUnity
                     callback?.Invoke(respData);
                 }
             }
+        }
+
+        public string UploadFile(string url, string fileName, string token = null)
+        {
+            var client = new WebClient();
+            client.QueryString.Add("token", token);
+            var byteResp = client.UploadFile(url, fileName);
+            return Encoding.UTF8.GetString(byteResp);
         }
     }
 }
