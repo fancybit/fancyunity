@@ -46,7 +46,7 @@ namespace FancyUnity
         {
             var jsonData = JsonConvert.SerializeObject(postData);
             var form = new Dictionary<string, string>();
-            form.Add("data", jsonData);
+            form.Add("Data", jsonData);
             using (var webRequest = UnityWebRequest.Post(url, form))
             {
                 var req = webRequest.SendWebRequest();
