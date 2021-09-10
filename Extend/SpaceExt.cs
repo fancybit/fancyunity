@@ -176,14 +176,25 @@ namespace FancyUnity
             }
         }
 
-        public static void ForEachDescendant(this Transform self, Action<Transform> visitor)
+        public static void ForEachDescendant(
+            this Transform self, 
+            Action<Transform> visitor,
+            Func<Transform,bool> filter = null)
         {
-            visitor(self);
+            if(filter==null || filter(self)) visitor(self);
             self.ForEach((trans, _) =>
             {
                 trans.ForEachDescendant(visitor);
                 return true;
             });
+        }
+
+        public static void ForEachDescendant(
+            this Transform self,
+            Action<Transform> visitor,
+            string objectName)
+        {
+            ForEachDescendant(self,visitor,(trans)=>trans.name == objectName);
         }
 
         public static void ClearChildren(this Transform self)

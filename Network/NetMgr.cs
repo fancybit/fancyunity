@@ -67,12 +67,50 @@ namespace FancyUnity
             }
         }
 
-        public string UploadFile(string url, string fileName, string token = null)
+        public void UploadFile<TResp>(
+            string url,
+            string fileName,
+            Action<TResp> callback,
+            string token = null)
+            where TResp : class
         {
+            StartCoroutine(doUploadFile(url,fileName,callback,token));
+        }
+
+        public IEnumerator doUploadFile<TResp>(
+            string url, 
+            string fileName, 
+            Action<TResp> callback, 
+            string token = null)
+            where TResp:class
+        {
+            var form = new WWWForm();
+            form.AddField("token",token);
+            form.AddBinaryData("File", File.ReadAllBytes("fileName"));
+            using (var webRequest = UnityWebRequest.Post(url, form))
+            {
+                var req = webRequest.SendWebRequest();
+                yield return req;
+
+                // 出现网络错误
+                if (webRequest.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError(webRequest.error + "\n" + webRequest.downloadHandler.text);
+                }
+                else// 正常处理
+                {
+                    // 获取到的数据
+                    string strData = webRequest.downloadHandler.text;
+                    callback?.Invoke(JsonConvert.DeserializeObject<TResp>(strData));
+                }
+            }
+
+            /*
             var client = new WebClient();
             client.QueryString.Add("token", token);
             var byteResp = client.UploadFile(url, fileName);
             return Encoding.UTF8.GetString(byteResp);
+            */
         }
     }
 }
