@@ -1,8 +1,8 @@
 {
     "name": "FancyUnity",
+    "rootNamespace": "",
     "references": [
-        "GUID:87a27b898d586bd49ad656f9adc4e204",
-        "GUID:f1e5e3e45194c0a4787ad5bc5ff1ef85"
+        "GUID:87a27b898d586bd49ad656f9adc4e204"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -11,5 +11,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }
