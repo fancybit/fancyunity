@@ -95,8 +95,6 @@ namespace FancyUnity
         public const ulong WS_MINIMIZEBOX = 0x00020000L;
         public const ulong WS_MAXIMIZEBOX = 0x00010000L;
 
-        public const ulong WS_EX_LAYERED = 0x00080000L;
-
         public const uint LWA_COLORKEY = 0x00000001;
         public const uint LWA_ALPHA = 0x00000002;
 
@@ -121,6 +119,12 @@ namespace FancyUnity
         public const int SW_SHOWMAXIMIZED = 3;//最大化
         public const int SW_SHOWRESTORE = 1;//还原
 
+        const int GWL_STYLE = -16;
+        const int GWL_EXSTYLE = -20;
+        const uint WS_EX_TOPMOST = 0x00000008;
+        const uint WS_EX_LAYERED = 0x00080000;
+        const uint WS_EX_TRANSPARENT = 0x00000020;
+        const uint WS_EX_TOOLWINDOW = 0x00000080;//隐藏图标
 
         private static ulong _wndLng;
         private static IntPtr s_hwnd = IntPtr.Zero;
@@ -166,8 +170,11 @@ namespace FancyUnity
         public static void TransWindow()
         {
             s_hwnd = GetHWnd();
+            Debug.LogError("fb:"+s_hwnd.ToString());
+            Camera.main.depthTextureMode = DepthTextureMode.DepthNormals;
             var margins = new MARGINS() { cxLeftWidth = -1 };
-            SetWindowLong(s_hwnd, -16, WS_EX_LAYERED | WS_POPUP | WS_VISIBLE);
+            SetWindowLong(s_hwnd, GWL_STYLE, WS_EX_LAYERED | WS_POPUP | WS_VISIBLE);
+            SetWindowLong(s_hwnd, GWL_EXSTYLE, WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_TRANSPARENT); // 实现鼠标穿透
             DwmExtendFrameIntoClientArea(s_hwnd, ref margins);
         }
 
