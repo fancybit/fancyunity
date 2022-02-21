@@ -13,16 +13,18 @@ namespace FancyUnity
     /// <summary>
     /// Layout Group controller that arranges children in rows, fitting as many on a line until total width exceeds parent bounds
     /// </summary>
-    [AddComponentMenu("Layout/Extensions/Fixed Grid Layout Group")]
+    [AddComponentMenu("Layout/Extensions/FixedColumnsLayoutGroup")]
     public class FixedColumnsLayoutGroup : LayoutGroup
     {
         public int ColumnCount = 2;
         public Vector2 Gaps = new Vector2(5f, 5f);
         public float WHRatio = 16f / 9f;
+        public bool CustomCellSize = false;
+        public float CellWidth;
+        public float CellHeight;
+        public Vector2 Offset;
 
         protected RectTransform rectTrans;
-        protected float _cellWidth;
-        protected float _cellHeight;
 
         protected override void Start()
         {
@@ -41,8 +43,8 @@ namespace FancyUnity
         public override void SetLayoutHorizontal()
         {
             //限制列数
-            _cellWidth = Mathf.Abs(GetTotalPreferredSize(0) / ColumnCount);
-            var cellWidth = _cellWidth;
+            if(!CustomCellSize) CellWidth = Mathf.Abs(GetTotalPreferredSize(0) / ColumnCount);
+            var cellWidth = CellWidth;
             cellWidth -= Gaps.x;
             transform.ForEach((tr, i) =>
             {
@@ -53,7 +55,7 @@ namespace FancyUnity
                 var vec = rectTr.sizeDelta;
                 vec.x = cellWidth;
                 rectTr.sizeDelta = vec;
-                var x = (i % ColumnCount) * _cellWidth + Gaps.x;
+                var x = (i % ColumnCount) * CellWidth + Gaps.x + Offset.x;
                 SetChildAlongAxis(rectTr, 0, x);
 
                 return true;
@@ -70,8 +72,8 @@ namespace FancyUnity
             }
             else
             {
-                _cellHeight = WHRatio * _cellWidth;
-                var selfHeight = _cellHeight * (transform.childCount / ColumnCount);
+                if (!CustomCellSize) CellHeight = WHRatio * CellWidth;
+                var selfHeight = CellHeight * (transform.childCount / ColumnCount) - Offset.y;
                 SetLayoutInputForAxis(selfHeight, selfHeight, -1, 1);
                 rectTrans.anchorMin = new Vector2(0, 1);
                 rectTrans.anchorMax = new Vector2(1, 1);
@@ -83,10 +85,10 @@ namespace FancyUnity
         public override void SetLayoutVertical()
         {
             
-            var cellHeight = _cellHeight;
+            var cellHeight = CellHeight;
             cellHeight -= Gaps.y;
-            _cellWidth = Mathf.Abs(GetTotalPreferredSize(0) / ColumnCount);
-            var cellWidth = _cellWidth;
+            if (!CustomCellSize)  CellWidth = Mathf.Abs(GetTotalPreferredSize(0) / ColumnCount);
+            var cellWidth = CellWidth;
             if (cellHeight < 0) cellHeight = 0;
             if (cellHeight == 0)
             {
@@ -113,7 +115,7 @@ namespace FancyUnity
                 rectTr.sizeDelta = vec;
                 //设置y轴位置
                 var height = (i / ColumnCount + 1) * Gaps.y
-                    + Mathf.Abs(i / ColumnCount * cellHeight);
+                    + Mathf.Abs(i / ColumnCount * cellHeight) + Offset.y;
                 SetChildAlongAxis(rectTr, 1, height);
                 return true;
             });

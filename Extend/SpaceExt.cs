@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.EventSystems;
+
 namespace FancyUnity
 {
     public static class SpaceExt
@@ -176,12 +178,27 @@ namespace FancyUnity
             }
         }
 
-        public static void ForEachDescendant(
-            this Transform self, 
-            Action<Transform> visitor,
-            Func<Transform,bool> filter = null)
+        public static void ForEach(this RectTransform self, Func<RectTransform, int, bool> visitor)
         {
-            if(filter==null || filter(self)) visitor(self);
+            for (var i = 0; i < self.childCount; ++i)
+            {
+                var transChild = self.GetChild(i) as RectTransform;
+                if (!visitor(transChild, i)) return;
+            }
+        }
+
+        /// <summary>
+        /// 深度优先遍历
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="visitor"></param>
+        /// <param name="filter"></param>
+        public static void ForEachDescendant(
+            this Transform self,
+            Action<Transform> visitor,
+            Func<Transform, bool> filter = null)
+        {
+            if (filter == null || filter(self)) visitor(self);
             self.ForEach((trans, _) =>
             {
                 trans.ForEachDescendant(visitor);
@@ -189,12 +206,56 @@ namespace FancyUnity
             });
         }
 
+        /// <summary>
+        /// 深度优先遍历
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="visitor"></param>
+        /// <param name="objectName"></param>
         public static void ForEachDescendant(
             this Transform self,
             Action<Transform> visitor,
             string objectName)
         {
-            ForEachDescendant(self,visitor,(trans)=>trans.name == objectName);
+            ForEachDescendant(self, visitor, (trans) => trans.name == objectName);
+        }
+
+        /// <summary>
+        /// 深度优先遍历
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="visitor"></param>
+        /// <returns></returns>
+        public static bool DFS(this Transform self, 
+            Func<Transform,bool> visitor)
+        {
+            visitor(self);
+            self.ForEach((trans, _) =>
+            {
+                return trans.DFS(visitor);
+            });
+            return true;
+        }
+
+        /// <summary>
+        /// 广度优先遍历
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="visitor"></param>
+        public static void BFS(this Transform self,
+            Action<Transform> visitor)
+        {
+            var q = new Queue<Transform>();
+            q.Enqueue(self);
+            while (q.Count > 0)
+            {
+                var tr = q.Dequeue();
+                visitor(tr);
+                tr.ForEach((tr,_)=> {
+                    q.Enqueue(tr);
+                    return true;
+                });
+            }
         }
 
         public static void ClearChildren(this Transform self)
@@ -319,6 +380,60 @@ namespace FancyUnity
             self.transform.localPosition = Vector3.zero;
             self.transform.localRotation = Quaternion.identity;
             self.transform.localScale = Vector3.one;
+        }
+
+        public static Bounds GetTotalBounds(this Transform self)
+        {
+            var trans = self.transform;
+            var result = new Bounds();
+            var center = Vector3.zero;
+            var count = 0;
+            var minSize = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            var maxSize = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+
+            trans.ForEachDescendant(tr =>
+            {
+                var renderer = tr.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    var b = renderer.bounds;
+                    center += b.center;
+                    ++count;
+                    if (b.min.x < minSize.x) minSize.x = b.min.x;
+                    if (b.min.y < minSize.y) minSize.y = b.min.y;
+                    if (b.min.z < maxSize.z) minSize.z = b.min.z;
+                    if (b.max.x > maxSize.x) maxSize.x = b.max.x;
+                    if (b.max.y > maxSize.y) maxSize.y = b.max.y;
+                    if (b.max.z > maxSize.z) maxSize.z = b.max.z;
+                }
+            });
+            result.center = center / count;
+            result.size = maxSize - minSize;
+            return result;
+        }
+
+        public static Rect GetTotalRect(this RectTransform self)
+        {
+            var result = new Rect();
+            var minSizeX = 0f;
+            var minSizeY = 0f;
+            var maxSizeX = 0f;
+            var maxSizeY = 0f;
+
+            self.ForEachDescendant(tr =>
+            {
+                var uiElem = tr.GetComponent<UIBehaviour>();
+                if (uiElem != null)
+                {
+                    var rt = uiElem.GetComponent<RectTransform>();
+                    if (rt.offsetMin.x < minSizeX) minSizeX = rt.offsetMin.x;
+                    if (rt.offsetMin.y < minSizeY) minSizeY = rt.offsetMin.y;
+                    if (rt.offsetMax.x > maxSizeX) maxSizeX = rt.offsetMax.x;
+                    if (rt.offsetMax.y > maxSizeY) maxSizeY = rt.offsetMax.y;
+                }
+            });
+            result = Rect.MinMaxRect(minSizeX,minSizeY,maxSizeX,maxSizeY);
+            return result;
         }
     }
 }
