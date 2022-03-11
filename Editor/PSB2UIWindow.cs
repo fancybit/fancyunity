@@ -1,20 +1,17 @@
-﻿using System.IO;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using FancyCSharp;
+using UnityEngine.UI;
 
 namespace FancyUnity
 {
+    [EditorWindowTitle(title = "PSB to UGUI", useTypeNameAsIconName = false)]
     public class PSB2UIWindow : EditorWindow
     {
         private GameObject canvas;
-        private RectTransform uiTrans;
-        private Canvas uiCanvas;
         private float scale = 100;
+        private bool bRecusivePercentMode = true;
 
         [MenuItem("FancyUnity/PSB转UGUI")]
         public static void ShowWindow()
@@ -51,9 +48,9 @@ namespace FancyUnity
                     //创建UI Canvas和必备组件
                     canvas = new GameObject();
                     canvas.name = "UICanvas";
-                    uiTrans = canvas.AddComponent<RectTransform>();
-                    uiTrans.LocalReset();
-                    uiCanvas = canvas.AddComponent<Canvas>();
+                    var rtCanvas = canvas.AddComponent<RectTransform>();
+                    rtCanvas.LocalReset();
+                    var uiCanvas = canvas.AddComponent<Canvas>();
                     uiCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
                     uiCanvas.pixelPerfect = true;
                     canvas.AddComponent<CanvasScaler>();
@@ -66,6 +63,7 @@ namespace FancyUnity
                     evtSystem.AddComponent<StandaloneInputModule>();
                 }
             }
+
             if (GUILayout.Button("开始转换"))
             {
                 var sel = Selection.activeGameObject;
@@ -105,13 +103,26 @@ namespace FancyUnity
                 sel.transform.ForEachDescendant(tr =>
                 {
                     var uiElem = new GameObject(tr.name);
-                    map.Add(tr, uiElem.AddComponent<RectTransform>());
+                    var rt = uiElem.AddComponent<RectTransform>();
+                    map.Add(tr, rt);
+                    //锚记放在中心
+                    var anchorPos = new Vector2(0.5f, 0.5f);
+                    rt.anchorMin = anchorPos;
+                    rt.anchorMax = anchorPos;
+
+                    //设置UI树节点RectTransform宽高
+                    var bounds = tr.GetTotalBounds();
+                    rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
+                        Mathf.Abs(bounds.size.x) * scale);
+                    rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,
+                        Mathf.Abs(bounds.size.y) * scale);
                 });
 
-                //配置ui的层级关系 添加图层组件
+                //设置位置
                 sel.transform.BFS(tr =>
                 {
                     var uiElem = map[tr].gameObject;
+                    //配置ui的层级关系
                     if (tr.parent != null &&
                         map.TryGetValue(tr.parent, out RectTransform uiElemParent) &&
                         uiElemParent != null)
@@ -122,47 +133,46 @@ namespace FancyUnity
                     {
                         uiElem.transform.SetParent(canvas.transform);
                     }
-                    uiElem.transform.LocalReset();
+                    uiElem.transform.LocalReset();//所有图层和图层组在坐标原点
 
                     //位置
-                    uiTrans = uiElem.GetComponent<RectTransform>();
-                    uiTrans.anchorMin = new Vector2(0.5f, 0.5f);
-                    uiTrans.anchorMax = new Vector2(0.5f, 0.5f);
-                    uiTrans.offsetMin = uiTrans.offsetMin = Vector2.zero;
-                    uiTrans.offsetMax = uiTrans.offsetMax = Vector2.zero;
+                    var rtTrans = uiElem.GetComponent<RectTransform>();
+                    var transCanvas = canvas.transform as RectTransform;
+                    var rtCanvas = canvas.transform as RectTransform;
 
-                    //图片
                     var renderer = tr.GetComponent<SpriteRenderer>();
                     if (renderer != null)
                     {//一般图层
-                        uiTrans.offsetMax = uiTrans.offsetMin
-                            = tr.transform.localPosition * scale;
-
                         var image = uiElem.gameObject.AddComponent<Image>();
                         image.sprite = renderer.sprite;
-                        image.SetNativeSize();
+                        var pos = tr.transform.localPosition * scale;
+                        //图层下移，因为ps的坐标系中心在底部中心
+                        pos.y -= transCanvas.sizeDelta.y * 0.5f;
+                        var pos2 = new Vector2(pos.x, pos.y);
+                        rtTrans.anchoredPosition += pos2;
                     }
-                    else
-                    {//调整图层组中心点
-                        var rtUIElem = map[tr] as RectTransform;
-                        //图层组以包含的所有图层的包围框几何中心为中心
-                        var center = rtUIElem.GetTotalRect().center;
-                        var diff = center - rtUIElem.offsetMin;
-                        uiTrans.offsetMin += diff;
-                        uiTrans.offsetMax += diff;
-                        rtUIElem.ForEach((rt, i) =>
+                });
+
+                //移动图层组坐标 从原点到包含层图包围盒中心
+                sel.transform.BFS(tr =>
+                {
+                    var rtTrans = map[tr];
+                    var renderer = tr.GetComponent<SpriteRenderer>();
+                    if (renderer == null)
+                    {//图层组
+                        var bounds = tr.GetTotalBounds();
+                        Vector2 diff = bounds.center * scale;
+                        diff.y -= canvas.GetComponent<RectTransform>().sizeDelta.y*0.5f;
+
+                        rtTrans.anchoredPosition += diff;
+                        rtTrans.ForEach((rt, i) =>
                         {
-                            rt.offsetMin -= diff;
-                            rt.offsetMax -= diff;
+                            rt.anchoredPosition -= diff;
                             return true;
                         });
                     }
                 });
-                var rootRect = map[sel.transform];
-                var centerPos = new Vector2(0.5f, 0f);
-                rootRect.anchorMin = centerPos;
-                rootRect.anchorMax = centerPos;
-                rootRect.offsetMin = rootRect.offsetMin = Vector2.zero;
+
                 DestroyImmediate(sel);
                 Debug.Log("转换完成");
             }

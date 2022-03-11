@@ -178,11 +178,12 @@ namespace FancyUnity
             }
         }
 
-        public static void ForEach(this RectTransform self, Func<RectTransform, int, bool> visitor)
+        public static void ForEach<T>(this T self, Func<T, int, bool> visitor)
+            where T : Transform
         {
             for (var i = 0; i < self.childCount; ++i)
             {
-                var transChild = self.GetChild(i) as RectTransform;
+                var transChild = self.GetChild(i) as T;
                 if (!visitor(transChild, i)) return;
             }
         }
@@ -226,8 +227,8 @@ namespace FancyUnity
         /// <param name="self"></param>
         /// <param name="visitor"></param>
         /// <returns></returns>
-        public static bool DFS(this Transform self, 
-            Func<Transform,bool> visitor)
+        public static bool DFS(this Transform self,
+            Func<Transform, bool> visitor)
         {
             visitor(self);
             self.ForEach((trans, _) =>
@@ -238,21 +239,61 @@ namespace FancyUnity
         }
 
         /// <summary>
+        /// 深度优先遍历
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="visitor"></param>
+        /// <returns></returns>
+        public static bool DFS<T>(this T self,
+            Func<T, bool> visitor) where T : Transform
+        {
+            visitor(self);
+            self.ForEach<T>((trans, _) =>
+            {
+                return trans.DFS<T>(visitor);
+            });
+            return true;
+        }
+
+        /// <summary>
         /// 广度优先遍历
         /// </summary>
         /// <param name="self"></param>
         /// <param name="visitor"></param>
-        public static void BFS(this Transform self,
-            Action<Transform> visitor)
+        public static void BFS(this RectTransform self,
+            Action<RectTransform> visitor)
         {
-            var q = new Queue<Transform>();
+            var q = new Queue<RectTransform>();
             q.Enqueue(self);
             while (q.Count > 0)
             {
                 var tr = q.Dequeue();
                 visitor(tr);
-                tr.ForEach((tr,_)=> {
+                tr.ForEach((tr, _) =>
+                {
                     q.Enqueue(tr);
+                    return true;
+                });
+            }
+        }
+
+        /// <summary>
+        /// 广度优先遍历
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="visitor"></param>
+        public static void BFS<T>(this T self,
+            Action<T> visitor) where T : Transform
+        {
+            var q = new Queue<T>();
+            q.Enqueue(self);
+            while (q.Count > 0)
+            {
+                var tr = q.Dequeue();
+                visitor(tr);
+                tr.ForEach((tr, _) =>
+                {
+                    q.Enqueue(tr as T);
                     return true;
                 });
             }
@@ -387,7 +428,6 @@ namespace FancyUnity
             var trans = self.transform;
             var result = new Bounds();
             var center = Vector3.zero;
-            var count = 0;
             var minSize = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             var maxSize = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
@@ -397,8 +437,8 @@ namespace FancyUnity
                 if (renderer != null)
                 {
                     var b = renderer.bounds;
+                    if (b.size == Vector3.zero) return;//略过无体积物体
                     center += b.center;
-                    ++count;
                     if (b.min.x < minSize.x) minSize.x = b.min.x;
                     if (b.min.y < minSize.y) minSize.y = b.min.y;
                     if (b.min.z < maxSize.z) minSize.z = b.min.z;
@@ -407,8 +447,8 @@ namespace FancyUnity
                     if (b.max.z > maxSize.z) maxSize.z = b.max.z;
                 }
             });
-            result.center = center / count;
-            result.size = maxSize - minSize;
+            result.min = minSize;
+            result.max = maxSize;
             return result;
         }
 
@@ -432,8 +472,21 @@ namespace FancyUnity
                     if (rt.offsetMax.y > maxSizeY) maxSizeY = rt.offsetMax.y;
                 }
             });
-            result = Rect.MinMaxRect(minSizeX,minSizeY,maxSizeX,maxSizeY);
+            result = Rect.MinMaxRect(minSizeX, minSizeY, maxSizeX, maxSizeY);
             return result;
+        }
+
+        public static void PercentMode(this RectTransform self)
+        {
+            var rectTrans = self.GetComponent<RectTransform>();
+            var parentRect = (rectTrans.parent as RectTransform).rect;
+            rectTrans.anchorMin = new Vector2(
+                rectTrans.rect.xMin / parentRect.xMin,
+                rectTrans.rect.yMin / parentRect.yMin);
+            rectTrans.anchorMax = new Vector2(
+                rectTrans.rect.xMax / parentRect.xMax,
+                rectTrans.rect.yMax / parentRect.yMax);
+            rectTrans.offsetMax = rectTrans.offsetMin = Vector2.zero;
         }
     }
 }
