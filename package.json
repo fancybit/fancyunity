@@ -1,0 +1,35 @@
+{
+  "name": "top.fancybit.fancyunity",
+  "version": "1.0.0",
+  "unity": "2020.2",
+  "unityRelease": "0a19",
+  "displayName": "FancyUnity",
+  "description": "Some Extension about unity",
+  "keywords": [
+    "C#",
+    "Unity3d",
+    "fancybit"
+  ],
+  "author":{
+    "name" : "fancybit",
+    "email" : "fancybit@qq.com",
+    "url" : "https://www.fancybit.top/"
+  },
+  "category": "C#",
+  "dependencies": {
+    "com.unity.ugui":"1.0.0",
+    "com.unity.2d.animation":"5.0.9",
+    "top.fancybit.fancycsharp": "1.0.0",
+    "odin":"1.0.0",
+    "newtonsoft.json":"2.0.0"
+    },
+  "relatedPackages": {
+  },
+  "samples": [
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/fancybit/fancy-unity.git",
+    "revision": "6536a9fc308edf3fea99f6518157be92137ad99b"
+  }
+}
