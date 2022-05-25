@@ -2,7 +2,10 @@
     "name": "FancyUnity",
     "rootNamespace": "",
     "references": [
-        "GUID:87a27b898d586bd49ad656f9adc4e204"
+        "GUID:87a27b898d586bd49ad656f9adc4e204",
+        "GUID:41524c21c95e5fe4dbc5b48bd21995a4",
+        "GUID:4237adb6ac177124b8f4a94835b7b4d0",
+        "GUID:88f14d179e7c91c4eac28302d69f32e1"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

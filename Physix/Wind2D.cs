@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.U2D;
+using UnityEngine.U2D.IK;
 using UnityEngine.Animations;
 
 public class Wind2D : SerializedMonoBehaviour
@@ -16,7 +16,7 @@ public class Wind2D : SerializedMonoBehaviour
     public float Damping = 1f;
 
     private float _maxCtrlBoneDist = 3f;
-    private IK.FabrikSolver2D _solver;
+    private FabrikSolver2D _solver;
     private Transform _tailBone;
     private Transform _ctrlPoint;
 

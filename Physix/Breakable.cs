@@ -1,23 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.U2D.IK;
 
 
 namespace FancyUnity
 {
     [AddComponentMenu("FancyBit/Unity")]
-    [RequireComponent(typeof(UnityEngine.U2D.IK.FabrikSolver2D))]
+    [RequireComponent(typeof(FabrikSolver2D))]
     public class Breakable : MonoBehaviour
     {
-
-        private UnityEngine.U2D.IK.FabrikSolver2D _solver;
+        private FabrikSolver2D _solver;
         private Floatable _ctrlPt;
         private FixedJoint2D _joint;
 
         // Start is called before the first frame update
         void Start()
         {
-            _solver = GetComponent<UnityEngine.U2D.IK.FabrikSolver2D>();
+            _solver = GetComponent<FabrikSolver2D>();
             var chain = _solver.GetChain(0);
             var boneCount = chain.lengths.Length;
             var bone = chain.effector;

@@ -1,6 +1,6 @@
 {
   "name": "top.fancybit.fancyunity",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "unity": "2020.2",
   "unityRelease": "0a19",
   "displayName": "FancyUnity",
@@ -21,7 +21,7 @@
     "com.unity.2d.animation":"5.0.9",
     "top.fancybit.fancycsharp": "1.0.0",
     "top.fancybit.odin_inspector":"1.0.1",
-    "newtonsoft.json":"1.0.0"
+    "newtonsoft.json":"1.0.1"
     },
   "relatedPackages": {
   },
