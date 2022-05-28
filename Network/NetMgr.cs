@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace FancyUnity
 {
-    public class NetMgr<T> : Singleton<T> where T : Component
+    public class NetMgr : Singleton<NetMgr>
     {
         public void Get<TRespData>(string url, Action<TRespData> callback)
             => StartCoroutine(GetRequest(url, callback));
