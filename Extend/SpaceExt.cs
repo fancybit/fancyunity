@@ -488,5 +488,14 @@ namespace FancyUnity
                 rectTrans.rect.yMax / parentRect.yMax);
             rectTrans.offsetMax = rectTrans.offsetMin = Vector2.zero;
         }
+
+        public static Vector2 WorldToUGUIPosition(this Camera self, Vector3 worldPosition, GameObject canvas)
+        {
+            var canvasRectTransform = canvas.GetComponent<RectTransform>();
+            //世界坐标->ViewPort坐标   
+            Vector2 viewPos = self.WorldToViewportPoint(worldPosition);
+            //ViewPort坐标-〉UGUI坐标
+            return new Vector2(canvasRectTransform.rect.width * viewPos.x - canvasRectTransform.rect.width * 0.5f, canvasRectTransform.rect.height * viewPos.y - canvasRectTransform.rect.height * 0.5f);
+        }
     }
 }
