@@ -8,21 +8,25 @@ using UnityEngine;
 
 namespace FancyUnity
 {
-    public class VarMon : SerializedMonoBehaviour
+    public class VarMon : Singleton<VarMon>
     {
-        private static Dictionary<string, string> _fields = new Dictionary<string, string>();
+        private Dictionary<string, string> _fields = new Dictionary<string, string>();
+        public GUIStyle Style = new GUIStyle();
+
         void OnGUI()
         {
             lock (_fields)
             {
+                GUILayout.BeginVertical(Style);
                 foreach (var f in _fields)
                 {
-                    GUILayout.TextField($"{f.Key}={f.Value}");
+                    GUILayout.TextField($"{f.Key}={f.Value}",Style);
                 }
+                GUILayout.EndVertical();
             }
         }
 
-        public static void Log(string valName, object value)
+        public void Log(string valName, object value)
         {
             lock (_fields)
             {
