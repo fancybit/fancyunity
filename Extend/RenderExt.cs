@@ -16,38 +16,48 @@ namespace FancyUnity
             
         }
 
-        public static void ShowTreeSprite(this Transform self, float t=1f)
+        public static void ShowTreeSprite(this Transform self,  float t=1f, Sequence seq=null)
         {
             self.ForEachDescendant(trans => {
-                DOTween.Complete(self.gameObject);
-                var sr = self.GetComponent<SpriteRenderer>().DOFade(1f,t);
+                var sr = trans.GetComponent<SpriteRenderer>();
+                sr.color = new Color(1, 1, 1, 0);
+                var anim = sr.DOFade(1f, t);
+                if (seq != null) seq.Join(anim);
+                else anim.Play();
             });
         }
 
-        public static void ShowTreeUI(this Transform self, float t=1f)
+        public static void ShowTreeUI(this Transform self, float t = 1f,Sequence seq=null)
         {
             self.ForEachDescendant(trans => {
-                DOTween.Complete(self.gameObject);
-                var sr = self.GetComponent<Image>().DOFade(1f, t);
+                var sr = trans.GetComponent<Image>();
+                sr.color = new Color(1, 1, 1, 0);
+                var anim = sr.DOFade(1f, t);
+                if (seq != null) seq.Join(anim);
+                else anim.Play();
             });
         }
 
-        public static void HideTreeSprite(this Transform self, float t=1f)
+        public static void HideTreeSprite(this Transform self, float t=1f,Sequence seq = null)
         {
             self.ForEachDescendant(trans => {
-                DOTween.Complete(self.gameObject);
-                var sr = self.GetComponent<SpriteRenderer>().DOFade(0f, t);
+                var sr = trans.GetComponent<SpriteRenderer>();
+                sr.color = new Color(1, 1, 1, 1);
+                var anim = sr.DOFade(0f, t);
+                if (seq != null) seq.Join(anim);
+                else anim.Play();
             });
         }
 
-        public static void HideTreeUI(this Transform self, float t = 1f)
+        public static void HideTreeUI(this Transform self,  float t = 1f,Sequence seq=null)
         {
             self.ForEachDescendant(trans => {
-                DOTween.Complete(self.gameObject);
-                var sr = self.GetComponent<Image>().DOFade(0f, t);
+                var sr = trans.GetComponent<Image>();
+                sr.color = new Color(1, 1, 1, 1);
+                var anim = sr.DOFade(0f, t);
+                if(seq!=null) seq.Join(anim);
+                else anim.Play();
             });
         }
-
     }
-
 }
