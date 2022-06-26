@@ -7,17 +7,18 @@ using UnityEngine;
 
 namespace FancyUnity
 {
-    [ExecuteInEditMode]
     public class FBCircle : MonoBehaviour
     {
         public Material DrawMaterial;
 
-        [SerializeField]
-        protected int _segments = 3;
-        [SerializeField]
-        protected float _radius = 1f;
-        [SerializeField]
-        protected Color _color = Color.green;
+        public int _segments = 3;
+        public float _radius = 1f;
+        public Color _color = Color.green;
+
+        protected virtual void Start()
+        {
+            DrawMaterial = ResMgr.Inst.CreateRes<Material>("Materials/CircleMat");
+        }
 
         [ShowInInspector]
         public Color MainColor
@@ -54,18 +55,22 @@ namespace FancyUnity
 
         protected List<Vector3> arrVec = new List<Vector3>();
 
-        private void OnRenderObject()
+        protected virtual void OnRenderObject()
         {
+            if (arrVec.Count == 0)
+            {
+                for (int i = 1; i <= Segments + 1; ++i)
+                {
+                    float angle = i * 2 * Mathf.PI / Segments;
+                    arrVec.Add(new Vector3(Mathf.Cos(angle) * Radius, 
+                        Mathf.Sin(angle) * Radius, 0));
+                }
+            }
+
             DrawMaterial.SetPass(0);
             GL.PushMatrix();
             GL.MultMatrix(transform.localToWorldMatrix);
             GL.Begin(GL.LINES);
-            arrVec.Clear();
-            for (int i = 1; i <= Segments+1; ++i)
-            {
-                float angle = i * 2 * Mathf.PI / Segments;
-                arrVec.Add(new Vector3(Mathf.Cos(angle) * Radius, Mathf.Sin(angle) * Radius, 0));
-            }
             GL.Color(MainColor);
             for (int i = 0; i < arrVec.Count-1; i++)
             {
@@ -78,5 +83,9 @@ namespace FancyUnity
             GL.Flush();
         }
 
+        public virtual void Dispose()
+        {
+            Destroy(gameObject);
+        }
     }
 }
