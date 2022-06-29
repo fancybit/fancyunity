@@ -12,7 +12,10 @@ namespace FancyUnity
     [RequireComponent(typeof(Mirror.NetworkIdentity))]
     public class NetIDComp : MonoBehaviour
     {
-        [ShowInInspector]
-        public uint NetID => GetComponent<Mirror.NetworkIdentity>().netId;
+        public uint NetId;
+        public void Update()
+        {
+            NetId = GetComponent<Mirror.NetworkIdentity>().netId;
+        }
     }
 }
