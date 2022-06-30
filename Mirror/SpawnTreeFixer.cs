@@ -11,8 +11,6 @@ namespace FancyUnity
 {
     public class SpawnTreeFixer : NetworkBehaviour
     {
-
-
         [Server]
         public void Fix(Transform root)
         {
@@ -30,7 +28,6 @@ namespace FancyUnity
                         Debug.LogWarning("有挂接点没有附加LinkSlot");
                         parentSlot = trans.parent.gameObject.AddComponent<LinkSlot>();
                         parentSlot.SlotName = trans.parent.name;
-                        parentSlot.RootNid = trans.parent.GetComponentInParent<NetworkIdentity>().netId;
                     }
                     var node = new TreeNodeInfo();
                     node.ChildNid = idComp.netId;
@@ -42,6 +39,7 @@ namespace FancyUnity
                     infos.Add(node);
                 }
             });
+            Debug.Log("挂接关系记录完成");
             //传输记录到客户端使其同步
             RpcUpdateTree(infos);
         }
@@ -49,6 +47,7 @@ namespace FancyUnity
         [ClientRpc]
         public void RpcUpdateTree(List<TreeNodeInfo> nodeInfos)
         {
+            Debug.Log("开始重新挂接");
             foreach (var n in nodeInfos)
             {
                 var child = NetworkClient.spawned[n.ChildNid].transform;

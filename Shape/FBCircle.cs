@@ -1,3 +1,4 @@
+using Mirror;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -7,50 +8,18 @@ using UnityEngine;
 
 namespace FancyUnity
 {
-    public class FBCircle : MonoBehaviour
+    public class FBCircle : NetworkBehaviour
     {
         public Material DrawMaterial;
 
-        public int _segments = 3;
-        public float _radius = 1f;
-        public Color _color = Color.green;
+        public int Segments = 128;
+        [SyncVar]
+        public float Radius = 1f;
+        public Color Color = Color.green;
 
         protected virtual void Start()
         {
             DrawMaterial = ResMgr.Inst.CreateRes<Material>("Materials/CircleMat");
-        }
-
-        [ShowInInspector]
-        public Color MainColor
-        {
-            get => _color;
-            set
-            {
-                DrawMaterial.color = value;
-                _color = value;
-            }
-        }
-
-        [ShowInInspector]
-        public int Segments
-        {
-            get => _segments;
-            set
-            {
-                if (value < 3) value = 3;
-                _segments = value;
-            }
-        }
-
-        [ShowInInspector]
-        public float Radius
-        {
-            get => _radius;
-            set
-            {
-                if (value < 0) value = 0;
-                _radius = value;
-            }
         }
 
         protected List<Vector3> arrVec = new List<Vector3>();
@@ -71,7 +40,7 @@ namespace FancyUnity
             GL.PushMatrix();
             GL.MultMatrix(transform.localToWorldMatrix);
             GL.Begin(GL.LINES);
-            GL.Color(MainColor);
+            GL.Color(Color);
             for (int i = 0; i < arrVec.Count-1; i++)
             {
                 GL.Vertex(arrVec[i]);

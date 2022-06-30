@@ -1,4 +1,5 @@
 ﻿using Mirror;
+using SII = Sirenix.OdinInspector.ShowInInspectorAttribute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace FancyUnity
     public class LinkSlot:MonoBehaviour
     {
         public string SlotName;
-        public uint RootNid;
+        [SII]
+        public uint RootNid => transform.parent.GetComponentInParent<NetworkIdentity>().netId;
     }
 }

@@ -34,7 +34,7 @@ namespace FancyUnity
 
         public bool AddSlot(string slotName, LinkSlot slot)
         {
-            if (!Slots.TryGetValue(slotName, out LinkSlot old))
+            if (Slots.TryGetValue(slotName, out LinkSlot old))
             {
                 Debug.LogError("slotName已存在");
                 throw new ArgumentException("slotName已存在");
@@ -42,7 +42,6 @@ namespace FancyUnity
             else
             {
                 Slots.Add(slotName, slot);
-                slot.RootNid = NidComp.netId;
                 return true;
             }
         }
