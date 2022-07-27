@@ -21,7 +21,7 @@ namespace FancyUnity
                 var idComp = trans.GetComponent<NetworkIdentity>();
                 if (idComp != null && trans.parent != null)
                 {//需要记录挂接
-                    Debug.Log("nid="+idComp.netId);
+                    //Debug.Log("nid="+idComp.netId);
                     var parentSlot = trans.parent.GetComponent<LinkSlot>();
                     if (parentSlot == null)
                     {
