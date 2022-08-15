@@ -21,7 +21,9 @@ namespace FancyUnity
             var mat = self.material;
             var c = mat.color;
             c.a = 1f;
-            mat.DOComplete(true);
+            mat.color = c;
+            //mat.DOComplete(true);
+            mat.DOKill(true);
         }
     }
 }
