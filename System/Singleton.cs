@@ -1,4 +1,3 @@
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace FancyUnity
@@ -20,11 +19,6 @@ namespace FancyUnity
         {
             get
             {
-                if (_inst == null)
-                {
-                    GameObject obj = new GameObject(typeof(T).Name);
-                    _inst = obj.AddComponent<T>();
-                }
                 return _inst;
             }
         }
@@ -32,8 +26,9 @@ namespace FancyUnity
         /// <summary>
         /// On awake, we initialize our instance. Make sure to call base.Awake() in override if you need awake.
         /// </summary>
-        protected virtual void Awake()
+        protected virtual void Start()
         {
+            if (_inst != null) throw new System.Exception("duplicate singleton");
             if (!Application.isPlaying)
             {
                 return;

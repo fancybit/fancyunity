@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 
 namespace FancyUnity
 {
-
     public class BatcherWindow : EditorWindow
     {
         private string layerName;
@@ -41,6 +40,7 @@ namespace FancyUnity
                     trans.ForEachDescendant((tr) =>
                         tr.gameObject.layer = LayerMask.NameToLayer(layerName));
                 }
+
 
             GUILayout.Label("批量更换命名空间");
             GUILayout.Label("新命名空间");
@@ -83,4 +83,3 @@ namespace FancyUnity
         }
     }
 }
-
