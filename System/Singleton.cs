@@ -5,7 +5,7 @@ namespace FancyUnity
     /// <summary>
     /// Singleton pattern.
     /// </summary>
-    public class Singleton<T> : MonoBehaviour where T : Component
+    public class Singleton<T>: MonoBehaviour where T : Component
     {
         public bool Perpetual = false;
 
