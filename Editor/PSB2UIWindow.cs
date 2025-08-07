@@ -41,7 +41,8 @@ namespace FancyUnity
                     if (img != null)
                     {//计算缩放比例
                         var spr = img.GetComponent<SpriteRenderer>().sprite;
-                        scale = spr.rect.width / spr.bounds.size.x * 2;
+                        if (spr.bounds.size.x == 0) scale = 100;
+                        else scale = spr.rect.width / spr.bounds.size.x * 2;
                     }
 
                     //scale默认为100
