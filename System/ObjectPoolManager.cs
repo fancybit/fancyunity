@@ -1,5 +1,8 @@
-﻿using System;
+﻿using FancyCSharp;
+using Mirror;
+using System;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 namespace FancyUnity
@@ -9,7 +12,9 @@ namespace FancyUnity
     /// </summary>
     public class ObjectPoolManager : Singleton<ObjectPoolManager>
     {
+        public long DefaultPoolSize = 10;
         public PoolSize[] InitPoolsSize;
+        public NetworkManager MirrorManager;
 
         protected Dictionary<string, Pool> poolTable
             = new Dictionary<string, Pool>();
@@ -98,6 +103,7 @@ namespace FancyUnity
         {
             protected Queue<GameObject> pool = new Queue<GameObject>();
             protected Transform mgrCon;
+            protected ObjectPoolManager mgr = Inst;
 
             public Pool(GameObject prefab)
             {
@@ -108,11 +114,43 @@ namespace FancyUnity
                 mgr.poolTable.Add(prefab.name, this);
                 mgrCon = new GameObject(prefab.name).transform;
                 mgrCon.SetParent(mgr.transform);
-                SetCapacity(10);
+                if (mgr.MirrorManager != null && NetworkClient.active)
+                {
+                    var netId = prefab.GetComponent<NetworkIdentity>();
+                    if (netId != null)
+                    {
+                        NetworkClient.RegisterPrefab(Prefab, OnSpawn, OnUnSpawn);
+                    }
+                }
+                SetCapacity(mgr.DefaultPoolSize);
             }
 
             public string PrefabName;
             public GameObject Prefab;
+
+            public GameObject Create()
+            {
+                var obj = GameObject.Instantiate(Prefab);
+                var info = obj.GetComponent<PoolTag>();
+                if (info == null)
+                {
+                    info = obj.AddComponent<PoolTag>();
+                }
+                info.Pool = this;
+                return obj;
+            }
+
+            private GameObject OnSpawn(Vector3 position, uint assetId)
+            {
+                var ret = Get();
+                ret.AddComponent<PoolTag>().Pool = this;
+                return ret;
+            }
+
+            private void OnUnSpawn(GameObject spawned)
+            {
+                Collect(spawned);
+            }
 
             public void SetCapacity(long capacity)
             {
@@ -128,14 +166,7 @@ namespace FancyUnity
                 {//扩容
                     for (long i = 0; i < capacity - pool.Count; ++i)
                     {
-                        var obj = GameObject.Instantiate(Prefab);
-                        var info = obj.GetComponent<PoolTag>();
-                        if (info == null)
-                        {
-                            info = obj.AddComponent<PoolTag>();
-                        }
-                        info.Pool = this;
-                        Collect(obj);
+                        Collect(Create());
                     }
                 }
             }
@@ -146,6 +177,14 @@ namespace FancyUnity
                 if (poolInfo == null)
                 {
                     poolInfo = obj.AddComponent<PoolTag>();
+                }
+                if (mgr.MirrorManager != null && NetworkClient.active)
+                {
+                    var netId = obj.GetComponent<NetworkIdentity>();
+                    if (netId != null)
+                    {
+                        MirrorPooler.Inst.Despawn(obj);
+                    }
                 }
                 poolInfo.ResetToPool();
             }
@@ -163,17 +202,7 @@ namespace FancyUnity
                     obj.SetActive(true);
                     return obj;
                 }
-                else
-                {
-                    var obj = GameObject.Instantiate(Prefab);
-                    var poolable = obj.GetComponent<PoolTag>();
-                    if (poolable == null)
-                    {
-                        poolable = obj.AddComponent<PoolTag>();
-                    }
-                    poolable.Pool = this;
-                    return obj;
-                }
+                return Create();
             }
 
             public List<GameObject> Get(long count)
@@ -219,6 +248,32 @@ namespace FancyUnity
         {
             public GameObject Prefab;
             public long Size;
+        }
+
+        public class MirrorPooler : Singleton<MirrorPooler>
+        {
+            public void Spawn(GameObject obj)
+            {
+                var poolMgr = ObjectPoolManager.Inst;
+                if (poolMgr.MirrorManager != null && NetworkServer.active)
+                {
+                    var pool = poolMgr.GetPool(obj);
+                    NetworkServer.Spawn(obj);
+                }
+            }
+
+            public void Despawn(GameObject obj)
+            {
+                var poolMgr = ObjectPoolManager.Inst;
+                if (poolMgr.MirrorManager != null && NetworkServer.active)
+                {
+                    var UnSpawnInternal = StaticMethodCaller.Get<GameObject, bool>(typeof(NetworkServer), "UnSpawnInternal");
+                    UnSpawnInternal.Call<GameObject, bool>(obj);
+                    NetworkServer.UnSpawn(obj);
+                }
+                var poolInfo = obj.GetComponent<Pool.PoolTag>();
+                poolInfo?.ResetToPool();
+            }
         }
     }
 }
